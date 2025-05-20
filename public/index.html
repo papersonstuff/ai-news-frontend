@@ -6,63 +6,70 @@
   <title>Papers.se – AI News</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
-      background-color: #007BFF;
-      color: white;
+      font-family: system-ui, sans-serif;
+      background-color: #ffffff;
+      color: #222;
       margin: 0;
       padding: 0;
+      line-height: 1.6;
     }
     header {
-      background-color: #0056b3;
-      color: white;
-      padding: 1em;
+      background-color: #1a1a1a;
+      color: #fff;
+      padding: 1.5rem 0;
       text-align: center;
+      font-size: 1.8rem;
+      font-weight: bold;
     }
     .filters {
-      text-align: center;
-      margin: 1em;
+      display: flex;
+      justify-content: center;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      padding: 1rem;
     }
     .filters button {
-      margin: 0.3em;
-      padding: 0.5em 1em;
+      padding: 0.6rem 1.2rem;
       border: none;
-      background-color: #333;
+      border-radius: 4px;
+      background-color: #444;
       color: white;
       cursor: pointer;
-      border-radius: 5px;
+      transition: background-color 0.2s ease-in-out;
     }
     .filters button:hover {
-      background-color: #555;
+      background-color: #666;
     }
     .news-container {
       max-width: 800px;
       margin: auto;
-      padding: 1em;
+      padding: 1.5rem;
     }
     .news-item {
-      background-color: white;
-      color: #000;
-      margin-bottom: 1em;
-      padding: 1em;
+      background-color: #f5f5f5;
       border-radius: 8px;
-      box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+      padding: 1rem;
+      margin-bottom: 1.2rem;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
     }
     .news-item h3 {
       margin-top: 0;
+      margin-bottom: 0.5rem;
     }
     .news-item a {
       text-decoration: none;
       color: #0066cc;
     }
     .news-item .meta {
+      font-size: 0.9rem;
       color: #666;
-      font-size: 0.9em;
+      margin-top: 0.5rem;
     }
   </style>
 </head>
 <body>
   <header>
-    <h1>Papers.se – AI News</h1>
+    Papers.se – AI News
   </header>
 
   <div class="filters">
@@ -74,7 +81,7 @@
   </div>
 
   <div class="news-container" id="news-container">
-    <!-- News will load here -->
+    <!-- News articles will be inserted here -->
   </div>
 
   <script>
@@ -84,25 +91,25 @@
 
     async function fetchNews() {
       try {
-        const res = await fetch(`${SUPABASE_URL}/rest/v1/ai_newsletter_email?select=*`, {
+        const response = await fetch(`${SUPABASE_URL}/rest/v1/ai_newsletter_email?select=*`, {
           headers: {
             apikey: SUPABASE_KEY,
-            Authorization: `Bearer ${SUPABASE_KEY}`,
-          },
+            Authorization: `Bearer ${SUPABASE_KEY}`
+          }
         });
-        const data = await res.json();
+        const data = await response.json();
         allNews = data.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
         displayNews(allNews);
-      } catch (err) {
-        document.getElementById("news-container").innerHTML = `<p style="color: red;">Error loading news. Please try again later.</p>`;
-        console.error("Failed to fetch news from Supabase:", err);
+      } catch (error) {
+        console.error("Error fetching news:", error);
+        document.getElementById("news-container").innerHTML = "<p style='color:red;'>Failed to load news articles.</p>";
       }
     }
 
-    function displayNews(newsItems) {
+    function displayNews(newsArray) {
       const container = document.getElementById("news-container");
       container.innerHTML = "";
-      newsItems.forEach(item => {
+      newsArray.forEach(item => {
         const div = document.createElement("div");
         div.className = "news-item";
         div.innerHTML = `
@@ -127,8 +134,7 @@
       }
     }
 
-    // Fetch and show news on page load
-    fetchNews();
+    window.onload = fetchNews;
   </script>
 </body>
 </html>
