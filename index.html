@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Papers.se – AI News</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f9f9f9;
+      color: #222;
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      background-color: #222;
+      color: white;
+      padding: 1em;
+      text-align: center;
+    }
+    .filters {
+      text-align: center;
+      margin: 1em;
+    }
+    .filters button {
+      margin: 0.3em;
+      padding: 0.5em 1em;
+      border: none;
+      background-color: #333;
+      color: white;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+    .filters button:hover {
+      background-color: #555;
+    }
+    .news-container {
+      max-width: 800px;
+      margin: auto;
+      padding: 1em;
+    }
+    .news-item {
+      background-color: white;
+      margin-bottom: 1em;
+      padding: 1em;
+      border-radius: 8px;
+      box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+    }
+    .news-item h3 {
+      margin-top: 0;
+    }
+    .news-item a {
+      text-decoration: none;
+      color: #0066cc;
+    }
+    .news-item .meta {
+      color: #666;
+      font-size: 0.9em;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Papers.se – AI News</h1>
+  </header>
+
+  <div class="filters">
+    <button onclick="filterNews('All')">All</button>
+    <button onclick="filterNews('Innovation')">Innovation</button>
+    <button onclick="filterNews('Business')">Business</button>
+    <button onclick="filterNews('Research')">Research</button>
+    <button onclick="filterNews('Tools')">Tools</button>
+  </div>
+
+  <div class="news-container" id="news-container">
+    <!-- News will load here -->
+  </div>
+
+  <script>
+    const SUPABASE_URL = "https://cvjgyphkpnqsepaaepvf.supabase.co";
+    const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN2amd5cGhrcG5xc2VwYWFlcHZmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDcwNDA0NDUsImV4cCI6MjA2MjYxNjQ0NX0.qAKV8J72QJAtPxB0yImS4iwXQjUX8g2pol0GW3rlJWw";
+
+    let allNews = [];
+
+    async function fetchNews() {
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/ai_newsletter_email?select=*`, {
+        headers: {
+          apikey: SUPABASE_KEY,
+          Authorization: `Bearer ${SUPABASE_KEY}`,
+        },
+      });
+      const data = await res.json();
+      allNews = data;
+      displayNews(data);
+    }
+
+    function displayNews(newsItems) {
+      const container = document.getElementById("news-container");
+      container.innerHTML = "";
+      newsItems.forEach(item => {
+        const div = document.createElement("div");
+        div.className = "news-item";
+        div.innerHTML = `
+          <h3><a href="${item.url}" target="_blank">${item.title}</a></h3>
+          <p>${item.summary}</p>
+          <div class="meta">
+            <strong>Category:</strong> ${item.category} | 
+            <strong>Source:</strong> ${item.source} | 
+            <strong>Date:</strong> ${new Date(item.timestamp).toLocaleDateString()}
+          </div>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    function filterNews(category) {
+      if (category === 'All') {
+        displayNews(allNews);
+      } else {
+        const filtered = allNews.filter(item => item.category === category);
+        displayNews(filtered);
+      }
+    }
+
+    // Fetch and show news on page load
+    fetchNews();
+  </script>
+</body>
+</html>
